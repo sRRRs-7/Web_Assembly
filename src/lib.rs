@@ -1,6 +1,7 @@
 mod utils;
 
 use wasm_bindgen::prelude::*;
+use js_sys;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -27,12 +28,13 @@ pub struct Creature {
 
 #[wasm_bindgen]
 impl Creature {
-    pub fn new() -> Self {
+    pub fn new(rng1: u32, rng2: u32) -> Self {
         let width = 64;
         let height = 64;
+
         let cells = (0..width * height)
             .map(|x| {
-                if x % 2 == 0 || x % 5 == 0 {
+                if x % rng1 == 0 || x % rng2 == 0 {
                     Cell::Alive
             } else {
                 Cell::Dead
@@ -40,6 +42,18 @@ impl Creature {
         }).collect();
 
         Self { width, height, cells }
+    }
+
+    pub fn width(&self) -> u32 {
+        self.width
+    }
+
+    pub fn height(&self) -> u32 {
+        self.height
+    }
+
+    pub fn cells(&self) -> *const Cell {
+        self.cells.as_ptr()
     }
 
     fn get_index(&self, row: u32, col:u32) -> usize {
@@ -108,7 +122,12 @@ impl Display for Creature {
     }
 }
 
-
+#[wasm_bindgen]
+pub fn get_random(min: f64, max: f64) -> f64 {
+    let float: f64 = js_sys::Math::random() * (max - min) + min;
+    let rng = js_sys::Math::ceil(float);
+    rng
+}
 
 
 #[cfg(test)]
@@ -117,7 +136,7 @@ mod tests {
 
     #[test]
     fn test1() {
-        let creature = Creature::new();
+        let creature = Creature::new(2, 7);
         assert_eq!(creature.width, 64);
     }
 }
