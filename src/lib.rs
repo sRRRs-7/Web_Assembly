@@ -1,7 +1,12 @@
-mod utils;
+
+pub mod mod2;
+pub mod utils;
+pub mod mod1;
 
 use wasm_bindgen::prelude::*;
 use js_sys;
+use mod2::*;
+
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -29,6 +34,8 @@ pub struct Creature {
 #[wasm_bindgen]
 impl Creature {
     pub fn new(rng1: u32, rng2: u32) -> Self {
+        utils::set_panic_hook();
+
         let width = 64;
         let height = 64;
 
@@ -56,11 +63,11 @@ impl Creature {
         self.cells.as_ptr()
     }
 
-    fn get_index(&self, row: u32, col:u32) -> usize {
+    pub fn get_index(&self, row: u32, col:u32) -> usize {
         (row * self.width + col) as usize
     }
 
-    fn alive_count_around(&self, row: u32, col: u32) -> u8  {
+    pub fn alive_count_around(&self, row: u32, col: u32) -> u8  {
         let mut count = 0;
         for d_row in [self.height - 1, 0, 1].clone() {
             for d_col in [self.width - 1, 0, 1].clone() {
@@ -85,6 +92,10 @@ impl Creature {
                 let live_count = self.alive_count_around(row, col);
                 let index = self.get_index(row, col);
                 let cell = cells[index];
+
+                log!("cell[{}, {}] (state: {:?}) around cell count: {}",
+                    row, col, cell, live_count
+                );
 
                 let next_cell = match (cell, live_count) {
                     (Cell::Alive, cnt) if cnt < 2 => Cell::Dead,
@@ -137,6 +148,6 @@ mod tests {
     #[test]
     fn test1() {
         let creature = Creature::new(2, 7);
-        assert_eq!(creature.width, 64);
+        assert_eq!(creature.width, 63);
     }
 }
