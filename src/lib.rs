@@ -93,14 +93,15 @@ impl Creature {
                 let index = self.get_index(row, col);
                 let cell = cells[index];
 
-                log!("cell[{}, {}] (state: {:?}) around cell count: {}",
-                    row, col, cell, live_count
-                );
-
                 let next_cell = match (cell, live_count) {
                     (Cell::Alive, cnt) if cnt < 2 => Cell::Dead,
                     (Cell::Alive, 2) | (Cell::Alive, 3) => Cell::Alive,
-                    (Cell::Alive, cnt) if cnt > 3 => Cell::Dead,
+                    (Cell::Alive, cnt) if cnt > 3 => {
+                        log!("cell[{}, {}] (state: {:?}) around cell count: {}",
+                        row, col, cell, live_count
+                    );
+                        Cell::Dead
+                    },
                     (Cell::Dead, 3) => Cell::Alive,
                     (otherwise, _)  => otherwise,
                 };
