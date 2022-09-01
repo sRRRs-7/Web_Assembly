@@ -1,7 +1,8 @@
 
 pub mod macros;
 pub mod utils;
-pub mod mod1;
+pub mod toggle;
+pub mod mover;
 
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures;
@@ -38,8 +39,8 @@ impl Creature {
     pub fn new(rng1: u32, rng2: u32) -> Self {
         utils::set_panic_hook();
 
-        let width = 64;
-        let height = 64;
+        let width = 35;
+        let height = 35;
 
         let cells = (0..width * height)
             .map(|x| {
@@ -98,12 +99,7 @@ impl Creature {
                 let next_cell = match (cell, live_count) {
                     (Cell::Alive, cnt) if cnt < 2 => Cell::Dead,
                     (Cell::Alive, 2) | (Cell::Alive, 3) => Cell::Alive,
-                    (Cell::Alive, cnt) if cnt > 3 => {
-                    //     log!("cell[{}, {}] (state: {:?}) around cell count: {}",
-                    //     row, col, cell, live_count
-                    // );
-                        Cell::Dead
-                    },
+                    (Cell::Alive, cnt) if cnt > 3 => Cell::Dead,
                     (Cell::Dead, 3) => Cell::Alive,
                     (otherwise, _)  => otherwise,
                 };
@@ -111,6 +107,7 @@ impl Creature {
             }
         }
         self.cells = cells;
+        log!("cells: {:?}", &self.cells);
     }
 
     pub fn render(&self) -> String {
@@ -159,6 +156,15 @@ mod tests {
     #[test]
     fn test1() {
         let creature = Creature::new(2, 7);
-        assert_eq!(creature.width, 63);
+        assert_eq!(creature.width, 65);
+    }
+
+    #[test]
+    fn divide() {
+        let mut creature = Creature::new(1, 10);
+        creature.set_width(3);
+        creature.set_height(3);
+        let calc = creature.width() * creature.height() / 2;
+        assert_eq!(calc, 4);
     }
 }

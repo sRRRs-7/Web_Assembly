@@ -16,14 +16,22 @@ impl Creature {
 
     pub fn toggle_cell(&mut self, row: u32, col: u32) {
         let w: usize = self.width as usize;
-        let h: usize = self.height as usize;
 
         let index = self.get_index(row, col);
         self.cells[index].toggle();
         self.cells[index + 1].toggle();
         self.cells[index - 1].toggle();
         self.cells[index + w].toggle();
-        self.cells[index - h].toggle();
+        self.cells[index - w].toggle();
+    }
+
+    pub fn reset_cell(&mut self) {
+        for row in 0..self.height {
+            for col in 0..self.width {
+                let index = self.get_index(row, col);
+                self.cells[index].reset();
+            }
+        }
     }
 }
 
@@ -42,9 +50,16 @@ impl Creature {
 
 impl Cell {
     pub fn toggle(&mut self) {
-        *self = match self {
+        *self = match *self {
             Cell::Alive => Cell::Dead,
             Cell::Dead => Cell::Alive,
+        }
+    }
+
+    pub fn reset(&mut self) {
+        *self = match *self {
+            Cell::Alive => Cell::Dead,
+            Cell::Dead => Cell::Dead,
         }
     }
 }
