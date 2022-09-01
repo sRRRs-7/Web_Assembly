@@ -1,11 +1,15 @@
 
-pub mod mod2;
+pub mod macros;
 pub mod utils;
 pub mod mod1;
 
 use wasm_bindgen::prelude::*;
+use wasm_bindgen_futures;
 use js_sys;
-use mod2::*;
+use macros::*;
+
+use std::{fmt::Display, time};
+use wasm_timer::Delay;
 
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
@@ -13,8 +17,6 @@ use mod2::*;
 #[cfg(feature = "wee_alloc")]
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
-
-use std::fmt::Display;
 
 #[wasm_bindgen]
 #[repr(u8)]
@@ -97,15 +99,14 @@ impl Creature {
                     (Cell::Alive, cnt) if cnt < 2 => Cell::Dead,
                     (Cell::Alive, 2) | (Cell::Alive, 3) => Cell::Alive,
                     (Cell::Alive, cnt) if cnt > 3 => {
-                        log!("cell[{}, {}] (state: {:?}) around cell count: {}",
-                        row, col, cell, live_count
-                    );
+                    //     log!("cell[{}, {}] (state: {:?}) around cell count: {}",
+                    //     row, col, cell, live_count
+                    // );
                         Cell::Dead
                     },
                     (Cell::Dead, 3) => Cell::Alive,
                     (otherwise, _)  => otherwise,
                 };
-
                 cells[index] = next_cell;
             }
         }
@@ -139,6 +140,15 @@ pub fn get_random(min: f64, max: f64) -> f64 {
     let float: f64 = js_sys::Math::random() * (max - min) + min;
     let rng = js_sys::Math::ceil(float);
     rng
+}
+
+#[wasm_bindgen]
+pub async fn sleep_millis(numbers: u16) -> js_sys::Promise {
+  let millis: u64 = u64::from(numbers);
+  Delay::new(time::Duration::from_millis(millis)).await.unwrap();
+
+  let promise = js_sys::Promise::resolve(&numbers.into());
+  return promise;
 }
 
 

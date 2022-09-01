@@ -13,6 +13,18 @@ impl Creature {
         self.height = height;
         self.cells = (0..self.width * height).map(|_| Cell::Dead).collect();
     }
+
+    pub fn toggle_cell(&mut self, row: u32, col: u32) {
+        let w: usize = self.width as usize;
+        let h: usize = self.height as usize;
+
+        let index = self.get_index(row, col);
+        self.cells[index].toggle();
+        self.cells[index + 1].toggle();
+        self.cells[index - 1].toggle();
+        self.cells[index + w].toggle();
+        self.cells[index - h].toggle();
+    }
 }
 
 impl Creature {
@@ -24,6 +36,15 @@ impl Creature {
         for (row, col) in cells.iter().clone() {
             let index = self.get_index(*row, *col);
             self.cells[index] = Cell::Alive;
+        }
+    }
+}
+
+impl Cell {
+    pub fn toggle(&mut self) {
+        *self = match self {
+            Cell::Alive => Cell::Dead,
+            Cell::Dead => Cell::Alive,
         }
     }
 }
