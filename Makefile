@@ -31,5 +31,11 @@ check_snip:
 zip:
 	gzip -9 < pkg/wasm_lib_bg.wasm | wc -c
 
+login:
+	wasm-pack login
 
-.PHONY: wasm, node, bench1, release, bench2, cmp, twiggy, snip, check_release, check_snip, zip
+publish:
+	wasm-pack publish
+
+
+.PHONY: wasm, node, bench1, release, bench2, cmp, twiggy, snip, check_release, check_snip, zip, login
