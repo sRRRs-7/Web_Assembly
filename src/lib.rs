@@ -3,6 +3,7 @@ pub mod macros;
 pub mod utils;
 pub mod toggle;
 pub mod mover;
+pub mod performance;
 
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures;
@@ -70,24 +71,80 @@ impl Creature {
         (row * self.width + col) as usize
     }
 
+    // pub fn alive_count_around(&self, row: u32, col: u32) -> u8  {
+    //     let mut count = 0;
+    //     for d_row in [self.height - 1, 0, 1].clone() {
+    //         for d_col in [self.width - 1, 0, 1].clone() {
+    //             if d_row == 0 && d_col == 0 {
+    //                 continue;
+    //             }
+    //             let row_idx = (row + d_row) % self.height;
+    //             let col_idx = (col + d_col) % self.width;
+
+    //             let idx = self.get_index(row_idx, col_idx);
+    //             count += self.cells[idx] as u8
+    //         }
+    //     };
+    //     count
+    // }
+
     pub fn alive_count_around(&self, row: u32, col: u32) -> u8  {
         let mut count = 0;
-        for d_row in [self.height - 1, 0, 1].clone() {
-            for d_col in [self.width - 1, 0, 1].clone() {
-                if d_row == 0 && d_col == 0 {
-                    continue;
-                }
-                let row_idx = (row + d_row) % self.height;
-                let col_idx = (col + d_col) % self.width;
 
-                let idx = self.get_index(row_idx, col_idx);
-                count += self.cells[idx] as u8
-            }
+        let top = if row == 0 {
+            self.height - 1
+        } else {
+            row - 1
         };
+
+        let bottom = if row == self.height - 1 {
+            0
+        } else {
+            row + 1
+        };
+
+        let left = if col == 0 {
+            self.width - 1
+        } else {
+            col - 1
+        };
+
+        let right = if col == self.width - 1 {
+            0
+        } else {
+            col + 1
+        };
+
+        let tl = self.get_index(top, left);
+        count += self.cells[tl] as u8;
+
+        let t = self.get_index(top, col);
+        count += self.cells[t] as u8;
+
+        let tr = self.get_index(top, right);
+        count += self.cells[tr] as u8;
+
+        let r = self.get_index(row, right);
+        count += self.cells[r] as u8;
+
+        let br = self.get_index(bottom, right);
+        count += self.cells[br] as u8;
+
+        let b = self.get_index(bottom, col);
+        count += self.cells[b] as u8;
+
+        let bl = self.get_index(bottom, left);
+        count += self.cells[bl] as u8;
+
+        let l = self.get_index(row, left);
+        count += self.cells[l] as u8;
+
         count
     }
 
     pub fn tick(&mut self) {
+        // let _timer = performance::Timer::new("Life Game");
+
         let mut cells = self.cells.clone();
 
         for row in 0..self.height {
@@ -96,24 +153,24 @@ impl Creature {
                 let index = self.get_index(row, col);
                 let cell = cells[index];
 
-                let next_cell = match (cell, live_count) {
+                let cell_state = match (cell, live_count) {
                     (Cell::Alive, cnt) if cnt < 2 => Cell::Dead,
                     (Cell::Alive, 2) | (Cell::Alive, 3) => Cell::Alive,
                     (Cell::Alive, cnt) if cnt > 3 => Cell::Dead,
                     (Cell::Dead, 3) => Cell::Alive,
                     (otherwise, _)  => otherwise,
                 };
-                cells[index] = next_cell;
+                cells[index] = cell_state;
             }
         }
         self.cells = cells;
-        log!("cells: {:?}", &self.cells);
     }
 
     pub fn render(&self) -> String {
         self.to_string()
     }
 }
+
 
 impl Display for Creature {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -147,7 +204,6 @@ pub async fn sleep_millis(numbers: u16) -> js_sys::Promise {
   let promise = js_sys::Promise::resolve(&numbers.into());
   return promise;
 }
-
 
 #[cfg(test)]
 mod tests {
