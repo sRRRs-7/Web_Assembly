@@ -166,6 +166,28 @@ impl Creature {
         self.cells = cells;
     }
 
+    // pub fn tick(&mut self) {
+    //     let mut cells = Vec::new();
+
+    //     for row in 0..self.height {
+    //         for col in 0..self.width {
+    //             let live_count = self.alive_count_around(row, col);
+    //             let index = self.get_index(row, col);
+    //             let cell = self.cells[index];
+
+    //             let cell_state = match (cell, live_count) {
+    //                 (Cell::Alive, cnt) if cnt < 2 => Cell::Dead,
+    //                 (Cell::Alive, 2) | (Cell::Alive, 3) => Cell::Alive,
+    //                 (Cell::Alive, cnt) if cnt > 3 => Cell::Dead,
+    //                 (Cell::Dead, 3) => Cell::Alive,
+    //                 (otherwise, _)  => otherwise,
+    //             };
+    //             cells.push(cell_state);
+    //         }
+    //     }
+    //     self.cells = cells;
+    // }
+
     pub fn render(&self) -> String {
         self.to_string()
     }

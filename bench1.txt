@@ -7,7 +7,7 @@ test result: ok. 0 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; fini
 
 
 running 1 test
-test tests::bench_ticks ... bench:      26,141 ns/iter (+/- 477)
+test tests::bench_ticks ... bench:      26,120 ns/iter (+/- 41)
 
-test result: ok. 0 passed; 0 failed; 0 ignored; 1 measured; 0 filtered out; finished in 0.56s
+test result: ok. 0 passed; 0 failed; 0 ignored; 1 measured; 0 filtered out; finished in 2.15s
 
